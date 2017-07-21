@@ -10,12 +10,12 @@ class ProductTemplate(models.Model):
 
     def taxes_by_company(self, field, company_id, match_tax_ids=None):
         taxes_ids = []
-        if match_tax_ids is None:
+        if not match_tax_ids:
             taxes_ids = self.env['ir.values'].get_default(
                 'product.template', field, company_id=company_id)
         # If None: return default taxes if []: return empty list
-        if not match_tax_ids:
-            return isinstance(taxes_ids, list) and taxes_ids or []
+        # if not match_tax_ids:
+        #     return isinstance(taxes_ids, list) and taxes_ids or []
         AccountTax = self.env['account.tax']
         for tax in AccountTax.browse(match_tax_ids):
             taxes_ids.extend(AccountTax.search([
