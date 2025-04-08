@@ -64,6 +64,16 @@ class ReturnPicking(models.TransientModel):
             .create(vals)
         )
         return_wizard._onchange_picking_id()
+        if len(return_wizard.product_return_moves) != len(self.product_return_moves):
+            exclude_prm = return_wizard.product_return_moves.filtered(
+                lambda prm: prm.product_id.id
+                not in self.mapped("product_return_moves.product_id").ids
+            )
+            return_wizard.product_return_moves = [(3, prm.id) for prm in exclude_prm]
+            for dest_line, line in zip(
+                return_wizard.product_return_moves, self.product_return_moves
+            ):
+                dest_line.write({"quantity": line.quantity})
         try:
             action = return_wizard.create_returns()
         except UserError:
