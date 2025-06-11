@@ -26,7 +26,7 @@ class ReturnPicking(models.TransientModel):
         ic_pick = ic_pick.with_user(intercompany_user)
 
         # warn in case of partial return
-        total_qty_sent = sum(pick.move_line_ids.mapped("product_uom_qty"))
+        total_qty_sent = sum(pick.move_line_ids.mapped("qty_done"))
         total_qty_returned = sum(self.product_return_moves.mapped("quantity"))
         if total_qty_returned < total_qty_sent:
             note = _(
@@ -46,8 +46,6 @@ class ReturnPicking(models.TransientModel):
                     or SUPERUSER_ID,
                 ),
             )
-            return res
-
         return_pick_id = res.get("res_id")
         if not return_pick_id:
             return res
@@ -64,16 +62,15 @@ class ReturnPicking(models.TransientModel):
             .create(vals)
         )
         return_wizard._onchange_picking_id()
-        if len(return_wizard.product_return_moves) != len(self.product_return_moves):
-            exclude_prm = return_wizard.product_return_moves.filtered(
-                lambda prm: prm.product_id.id
-                not in self.mapped("product_return_moves.product_id").ids
-            )
-            return_wizard.product_return_moves = [(3, prm.id) for prm in exclude_prm]
-            for dest_line, line in zip(
-                return_wizard.product_return_moves, self.product_return_moves
-            ):
-                dest_line.write({"quantity": line.quantity})
+        exclude_prm = return_wizard.product_return_moves.filtered(
+            lambda prm: prm.product_id.id
+            not in self.mapped("product_return_moves.product_id").ids
+        )
+        return_wizard.product_return_moves = [(3, prm.id) for prm in exclude_prm]
+        for dest_line, line in zip(
+            return_wizard.product_return_moves, self.product_return_moves
+        ):
+            dest_line.write({"quantity": line.quantity})
         try:
             action = return_wizard.create_returns()
         except UserError:
