@@ -119,9 +119,16 @@ class StockPicking(models.Model):
             purchase = pick.sale_id.auto_purchase_order_id
             if not purchase:
                 continue
-            purchase.picking_ids.write({"intercompany_picking_id": pick.id})
-            if not pick.intercompany_picking_id and purchase.picking_ids[0]:
-                pick.write({"intercompany_picking_id": purchase.picking_ids[0]})
+            purchase.picking_ids.filtered(
+                lambda p: not p.intercompany_picking_id
+                and not p.intercompany_return_picking_id
+            ).write({"intercompany_picking_id": pick.id})
+            if (
+                not pick.intercompany_picking_id
+                and not pick.intercompany_return_picking_id
+                and purchase.picking_ids[0]
+            ):
+                pick.write({"intercompany_picking_id": purchase.picking_ids[-1:]})
             pick._action_done_intercompany_actions(purchase)
         return super()._action_done()
 
