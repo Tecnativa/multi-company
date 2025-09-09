@@ -193,17 +193,17 @@ class StockPicking(models.Model):
                 and record.state == "done"
             ):
                 try:
-                    if (
-                        record.picking_type_code == "outgoing"
-                        and record.intercompany_picking_id
+                    if record.picking_type_code == "outgoing" and (
+                        record.intercompany_picking_id
+                        or record.intercompany_return_picking_id
                     ):
                         record._sync_receipt_with_delivery(
                             dest_company,
                             record.sale_id,
                         )
-                    elif (
-                        record.picking_type_code == "incoming"
-                        and record.intercompany_return_picking_id
+                    elif record.picking_type_code == "incoming" and (
+                        record.intercompany_picking_id
+                        or record.intercompany_return_picking_id
                     ):
                         record._sync_receipt_with_delivery(dest_company, None)
                 except Exception:
