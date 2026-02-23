@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="rma.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <app name="rma" position="inside">
+                <block
+                    title="Inter Company"
+                    name="intercompany_rma_setting_container"
+                    groups="base.group_multi_company"
+                >
+                    <setting id="intercompany_rma_setting">
+                        <field
+                            name="intercompany_rma"
+                            string="Generate Intercompany RMA"
+                        />
+                    </setting>
+                    <setting
+                        id="intercompany_rma_company_id_setting"
+                        invisible="not intercompany_rma"
+                    >
+                        <field
+                            name="intercompany_rma_company_id"
+                            string="Intercompany Company"
+                        />
+                    </setting>
+                    <setting
+                        id="intercompany_rma_team_id_setting"
+                        invisible="not intercompany_rma"
+                    >
+                        <field
+                            name="intercompany_rma_team_id"
+                            string="Intercompany Team"
+                        />
+                    </setting>
+                    <setting
+                        id="intercompany_rma_user_id_setting"
+                        invisible="not intercompany_rma"
+                    >
+                        <field
+                            name="intercompany_rma_user_id"
+                            string="Intercompany User"
+                        />
+                    </setting>
+                    <setting
+                        id="intercompany_rma_domain_setting"
+                        invisible="not intercompany_rma"
+                    >
+                        <field
+                            name="intercompany_rma_domain"
+                            string="Intercompany Domain"
+                            widget="domain"
+                            options="{'model': 'rma'}"
+                        />
+                    </setting>
+                </block>
+            </app>
+        </field>
+    </record>
+</odoo>
